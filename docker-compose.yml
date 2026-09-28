@@ -1,0 +1,51 @@
+networks:
+  net_lan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.10.0/24
+
+services:
+  # Servicio de Red: DNS + DHCP vía (dnsmasq)
+  server_dns_dhcp:
+    image: alpine:3.20.3
+    container_name: datacenter
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    networks:
+      net_lan:
+        ipv4_address: 172.16.10.21
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./dnsmasq-config/dnsmasq.conf:/etc/dnsmasq.conf:ro
+    command: >
+      sh -c "apk add --no-cache dnsmasq; dnsmasq -k --user=root --log-facility=-"
+    restart: always
+
+  # Contenedor Cliente Estudiante
+  student:
+    image: alpine:3.20.3
+    container_name: h1
+    networks:
+      - net_lan
+    cap_add:
+      - NET_ADMIN
+    # Comando para simular el encendido de h1
+    command: >
+      sh -c "echo 'nameserver 172.16.10.21' > /etc/resolv.conf && ip addr flush dev eth0 && udhcpc -i eth0 -b && sleep infinity"
+
+  # Contenedor Cliente Profesor  
+  professor:
+    image: alpine:3.20.3
+    container_name: h2
+    networks:
+      - net_lan
+    cap_add:
+      - NET_ADMIN
+    # Comando para simular el encendido de h2
+    command: >
+      sh -c "sleep infinity"
+
+
