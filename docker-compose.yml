@@ -4,10 +4,15 @@ networks:
     ipam:
       config:
         - subnet: 172.16.10.0/24
+  net_wan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.10.0/24
 
 services:
   # Servicio de Red: DNS + DHCP vía (dnsmasq)
-  server_dns_dhcp:
+  datacenter:
     image: alpine:3.20.3
     container_name: datacenter
     ports:
@@ -16,12 +21,17 @@ services:
     networks:
       net_lan:
         ipv4_address: 172.16.10.21
+      net_wan:
+        ipv4_address: 10.0.10.21
     cap_add:
       - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
     volumes:
       - ./dnsmasq-config/dnsmasq.conf:/etc/dnsmasq.conf:ro
     command: >
-      sh -c "apk add --no-cache dnsmasq; dnsmasq -k --user=root --log-facility=-"
+      sh -c "apk add --no-cache dnsmasq iptables curl && 
+             dnsmasq -k --user=root --log-facility=-"
     restart: always
 
   # Contenedor Cliente Estudiante
@@ -34,7 +44,11 @@ services:
       - NET_ADMIN
     # Comando para simular el encendido de h1
     command: >
-      sh -c "echo 'nameserver 172.16.10.21' > /etc/resolv.conf && ip addr flush dev eth0 && udhcpc -i eth0 -b && sleep infinity"
+      sh -c "apk add --no-cache curl && 
+             echo 'nameserver 172.16.10.21' > /etc/resolv.conf && 
+             ip addr flush dev eth0 && 
+             udhcpc -i eth0 && 
+             sleep infinity"
 
   # Contenedor Cliente Profesor  
   professor:
@@ -47,5 +61,22 @@ services:
     # Comando para simular el encendido de h2
     command: >
       sh -c "sleep infinity"
+  
+  # Servidor Web Externo
+  webserver:
+    image: alpine:3.20.3
+    container_name: webserver
+    networks:
+      net_wan:
+        ipv4_address: 10.0.10.80
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "apk add --no-cache python3 && 
+             ip route del default && 
+             ip route add default via 10.0.10.21 dev eth0 &&
+             mkdir -p /www && cd /www && 
+             echo '¡Hola! Bienvenido al Curso de Redes 2026' > index.html && 
+             python3 -m http.server 305"
 
 
