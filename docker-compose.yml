@@ -27,8 +27,8 @@ services:
     command: >
       sh -c "
       apk add --no-cache curl dnsmasq &&
-      IFACE_LAN=\$$(ip route get 172.16.10.1 | awk '{print \$$5}');
-      IFACE_WAN=\$$(ip route get 10.0.10.1 | awk '{print \$$5}');
+      IFACE_LAN=\$$(ip route get 172.16.10.11 | awk '{print \$$5}');
+      IFACE_WAN=\$$(ip route get 10.0.10.11 | awk '{print \$$5}');
       if [ -n \"\$$IFACE_WAN\" ]; then
         ip route del default 2>/dev/null;
         ip route add default via 10.0.10.1 dev \$$IFACE_WAN;
@@ -52,8 +52,8 @@ services:
     command: >
       sh -c "apk add --no-cache curl openssh-client && 
              echo 'nameserver 10.0.10.80' > /etc/resolv.conf && 
-             ip route del default;
-             ip route add default via 172.16.10.11 dev eth0 && 
+             ip addr flush dev eth0 && 
+             udhcpc -i eth0 &&
              sleep infinity"
 
   # Contenedor Cliente Profesor  
