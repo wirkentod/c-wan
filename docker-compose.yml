@@ -48,9 +48,13 @@ services:
       - net_lan
     cap_add:
       - NET_ADMIN
+    volumes:
+      - ./www:/root/www
     # Comando para simular el encendido de h1
     command: >
       sh -c "apk add --no-cache curl openssh-client && 
+             curl -L https://min.io -o /usr/local/bin/mc &&
+             chmod +x /usr/local/bin/mc &&
              echo 'nameserver 10.0.10.80' > /etc/resolv.conf && 
              ip addr flush dev eth0 && 
              udhcpc -i eth0 &&
@@ -127,5 +131,62 @@ services:
              dnsmasq -k --user=root --log-facility=-"
     restart: always
 
+  mailserver:
+    image: axllent/mailpit:v1.21.1
+    container_name: mailserver
+    ports:
+      - "1025:1025" # Puerto SMTP
+      - "8025:8025" # Interfaz Web
+      - "1110:1110" # POP3
+    networks:
+      net_wan:
+        ipv4_address: 10.0.10.90
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - MP_MAX_MESSAGES=100
+      # Servidor SMTP se identifica con este nombre al saludar (EHLO)
+      - MP_SMTP_HELO_DOMAIN=mail.pucp.edu.pe
+      - MP_POP3=0.0.0.0:1110
+      - MP_POP3_AUTH=telito@pucp.edu.pe:redes
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        ip route del default
+        ip route add default via 10.0.10.11 dev eth0
+        exec /mailpit
+    restart: always
+
+  s3server:
+    # Usamos la versión de desarrollo que contiene las herramientas del sistema necesarias
+    image: cgr.dev/chainguard/minio:latest-dev
+    container_name: s3server
+    user: "0:0"
+    ports:
+      - "9000:9000" # API S3
+      - "9001:9001" # Consola Web Gráfica
+    networks:
+      net_wan:
+        ipv4_address: 10.0.10.100
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - MINIO_ROOT_USER=labtel
+      - MINIO_ROOT_PASSWORD=redes2026
+    volumes:
+      - s3_data:/data
+    entrypoint:
+      - /bin/bash
+      - -ec
+      - |
+        apk add --no-cache iproute2
+        ip route del default 2>/dev/null || true
+        ip route add default via 10.0.10.11 dev eth0
+        # Ejecuta el servidor MinIO
+        exec minio server /data --console-address ":9001"
+    restart: always
+
 volumes:
   web_data:
+  s3_data:

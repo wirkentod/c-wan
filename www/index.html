@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redes de Computadoras | Panda Campeón 2026</title>
+    <style>
+        /* Fuentes del sistema modernas para evitar depender de Google Fonts */
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #22d3ee;
+            --accent-indigo: #6366f1;
+            --accent-emerald: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            antialiased: true;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Degradados y Efectos de Fondo */
+        .glow-1 {
+            position: absolute;
+            top: 0;
+            left: 25%;
+            width: 300px;
+            height: 300px;
+            background: rgba(34, 211, 238, 0.05);
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        /* Navbar */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-b: 1px solid rgba(31, 41, 55, 0.6);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1140px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: 0.05em;
+            color: #fff;
+        }
+
+        .logo-box {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .badge-router {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ping-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Hero Section */
+        header {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .welcome-tag {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(to right, rgba(34, 211, 238, 0.1), rgba(99, 102, 241, 0.1));
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            font-weight: 900;
+            line-height: 1.15;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        h1 span {
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-emerald), var(--accent-indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Elements & Grid */
+        main {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 1.5rem 6rem 1.5rem;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 5rem;
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(34, 211, 238, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .card-icon.indigo {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-indigo);
+        }
+
+        .card-icon.emerald {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--accent-emerald);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.925rem;
+            line-height: 1.6;
+        }
+
+        /* Split Section */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+            background: rgba(17, 24, 39, 0.2);
+            border: 1px solid rgba(31, 41, 55, 0.5);
+            padding: 2.5rem;
+            border-radius: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .split-section {
+                grid-template-columns: 1fr 1fr;
+            }
+            h1 { font-size: 4rem; }
+        }
+
+        .split-text h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .split-text p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: monospace;
+            font-size: 0.825rem;
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
+        }
+
+        .list-item span.bullet {
+            color: var(--accent-cyan);
+        }
+
+        /* Terminal Mockup (Reemplazo moderno de imagen rota) */
+        .terminal-box {
+            background: #05070f;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.8rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            color: #4b5563;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(31, 41, 55, 0.5);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+        .dot:nth-child(2) { background: #f59e0b; }
+        .dot:nth-child(3) { background: #10b981; }
+
+        .cmd-cyan { color: var(--accent-cyan); }
+        .cmd-emerald { color: var(--accent-emerald); }
+        .cmd-gray { color: #4b5563; font-size: 0.75rem; margin-top: 0.25rem; }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            font-size: 0.75rem;
+            color: #4b5563;
+            border-top: 1px solid #111827;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-1"></div>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo-area">
+                <div class="logo-box">⚡</div>
+                <span>LABTEL 2026</span>
+            </div>
+            <div class="badge-router">
+                <span class="ping-dot"></span>
+                <span>GW: DOCKER</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header>
+        <div class="welcome-tag">
+            👋 Bienvenido al Panda Campeón 2026
+        </div>
+        <h1>CURSO <br><span>Redes de Computadoras</span></h1>
+        <p class="hero-p">
+            Domina la arquitectura de internet, la manipulación de tráfico en contenedores de infraestructura y el despliegue de servicios S3 de alta disponibilidad.
+        </p>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <!-- GRID -->
+        <div class="grid-cards">
+            <div class="card">
+                <div class="card-icon">📂</div>
