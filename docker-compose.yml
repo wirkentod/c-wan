@@ -26,7 +26,7 @@ services:
       - net.ipv4.ip_forward=1
     command: >
       sh -c "
-      apk add --no-cache curl dnsmasq &&
+      apk add --no-cache curl dnsmasq tcpdump &&
       IFACE_LAN=\$$(ip route get 172.16.10.11 | awk '{print \$$5}');
       IFACE_WAN=\$$(ip route get 10.0.10.11 | awk '{print \$$5}');
       if [ -n \"\$$IFACE_WAN\" ]; then
@@ -52,9 +52,8 @@ services:
       - ./www:/root/www
     # Comando para simular el encendido de h1
     command: >
-      sh -c "apk add --no-cache curl openssh-client && 
-             curl -L https://min.io -o /usr/local/bin/mc &&
-             chmod +x /usr/local/bin/mc &&
+      sh -c "apk add --no-cache curl openssh-client minio-client tcpdump && 
+             ln -sf /usr/bin/mcli /usr/local/bin/mc &&
              echo 'nameserver 10.0.10.80' > /etc/resolv.conf && 
              ip addr flush dev eth0 && 
              udhcpc -i eth0 &&
@@ -70,7 +69,7 @@ services:
       - NET_ADMIN
     # Comando para simular el encendido de h2
     command: >
-      sh -c "apk add --no-cache curl openssh-client && 
+      sh -c "apk add --no-cache curl openssh-client tcpdump &&
              echo 'nameserver 10.0.10.80' > /etc/resolv.conf && 
              ip addr flush dev eth0 && 
              udhcpc -i eth0 &&
@@ -86,7 +85,7 @@ services:
     cap_add:
       - NET_ADMIN
     command: >
-      sh -c "apk add --no-cache python3 && 
+      sh -c "apk add --no-cache python3 tcpdump && 
              ip route del default && 
              ip route add default via 10.0.10.11 dev eth0 &&
              mkdir -p /www && cd /www && 
@@ -104,7 +103,8 @@ services:
     cap_add:
       - NET_ADMIN
     entrypoint: >
-      sh -c "ip route del default && 
+      sh -c "apk update && apk add --no-cache tcpdump &&
+             ip route del default && 
              ip route add default via 10.0.10.11 dev eth0 && 
              exec /entrypoint labtel:redes:::faci"
     volumes:
@@ -125,7 +125,7 @@ services:
     volumes:
       - ./dnsmasq-config/dnsmasq.conf:/etc/dnsmasq.conf:ro
     command: >
-      sh -c "apk add --no-cache dnsmasq iptables curl && 
+      sh -c "apk add --no-cache dnsmasq iptables curl tcpdump && 
              ip route del default && 
              ip route add default via 10.0.10.11 dev eth0 && 
              dnsmasq -k --user=root --log-facility=-"
@@ -153,6 +153,7 @@ services:
       - /bin/sh
       - -c
       - |
+        apk update && apk add --no-cache tcpdump
         ip route del default
         ip route add default via 10.0.10.11 dev eth0
         exec /mailpit
@@ -180,7 +181,7 @@ services:
       - /bin/bash
       - -ec
       - |
-        apk add --no-cache iproute2
+        apk add --no-cache iproute2 tcpdump
         ip route del default 2>/dev/null || true
         ip route add default via 10.0.10.11 dev eth0
         # Ejecuta el servidor MinIO
